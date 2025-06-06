@@ -159,7 +159,7 @@ export default function HistoryScreen({ navigation }: HistoryScreenProps) {
         <FlatList
           data={historyData}
           renderItem={renderItem}
-          keyExtractor={(item, index) => item.timestamp + '-' + index}
+          keyExtractor={(item, index) => item.id || (item.timestamp + '-' + index)}
           contentContainerStyle={historyData.length > 0 ? styles.listContent : styles.emptyListContent}
           ListEmptyComponent={ListEmptyComponent}
           refreshControl={

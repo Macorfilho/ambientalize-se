@@ -10,9 +10,19 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
 
 import { calculateRisk } from '../utils/riskCalculator';
 import { MonitoringData, RiskLevel } from '../types/common';
+
+type RootStackParamList = {
+  History: undefined;
+  DataEntry: undefined;
+  MitigationActions: { data?: MonitoringData };
+  RiskVisualization: undefined;
+};
+
+type MitigationActionsScreenProps = StackScreenProps<RootStackParamList, 'MitigationActions'>;
 
 const mitigationActions: { [key: string]: string[] } = {
   Baixo: [
@@ -56,33 +66,38 @@ const mitigationActions: { [key: string]: string[] } = {
   ],
 };
 
-export default function MitigationActionsScreen() {
+export default function MitigationActionsScreen({ route }: MitigationActionsScreenProps){
   const [currentRisk, setCurrentRisk] = useState<RiskLevel | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [latestData, setLatestData] = useState<MonitoringData | null>(null);
+  const [analyzedData, setAnalyzedData] = useState<MonitoringData | null>(null);
 
-  const loadLatestDataAndCalculateRisk = async () => {
+  const processAndDisplayData = async (dataToUse?: MonitoringData) => {
     setLoading(true);
     try {
-      const existingData = await AsyncStorage.getItem('monitoringData');
-      if (existingData) {
-        const dataArray: MonitoringData[] = JSON.parse(existingData);
-        if (dataArray.length > 0) {
-          const lastEntry = dataArray[dataArray.length - 1];
-          setLatestData(lastEntry);
-          setCurrentRisk(calculateRisk(lastEntry));
-        } else {
-          setLatestData(null);
-          setCurrentRisk({ text: 'Sem Dados', color: '#808080' });
-        }
+      let dataForAnalysis: MonitoringData | null = null;
+
+      if (dataToUse) {
+        dataForAnalysis = dataToUse;
       } else {
-        setLatestData(null);
+        const existingData = await AsyncStorage.getItem('monitoringData');
+        if (existingData) {
+          const dataArray: MonitoringData[] = JSON.parse(existingData);
+          if (dataArray.length > 0) {
+            dataForAnalysis = dataArray[dataArray.length - 1];
+          }
+        }
+      }
+
+      setAnalyzedData(dataForAnalysis);
+      if (dataForAnalysis) {
+        setCurrentRisk(calculateRisk(dataForAnalysis));
+      } else {
         setCurrentRisk({ text: 'Sem Dados', color: '#808080' });
       }
     } catch (error) {
-      console.error('Failed to load data for mitigation actions:', error);
-      Alert.alert('Erro', 'Não foi possível carregar os dados para as ações de mitigação.');
-      setLatestData(null);
+      console.error('Failed to process data for mitigation actions:', error);
+      Alert.alert('Erro', 'Não foi possível processar os dados para as ações de mitigação.');
+      setAnalyzedData(null);
       setCurrentRisk({ text: 'Erro no Cálculo', color: '#808080' });
     } finally {
       setLoading(false);
@@ -91,9 +106,10 @@ export default function MitigationActionsScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      loadLatestDataAndCalculateRisk();
+      const dataFromRoute = route.params?.data;
+      processAndDisplayData(dataFromRoute);
       return () => {};
-    }, [])
+    }, [route.params?.data])
   );
 
   const actionsToDisplay = currentRisk ? mitigationActions[currentRisk.text] : [];
@@ -109,22 +125,22 @@ export default function MitigationActionsScreen() {
           <View style={styles.content}>
             {currentRisk && (
               <View style={[styles.riskInfoCard, { borderColor: currentRisk.color }]}>
-                <Text style={styles.currentRiskLabel}>Nível de Risco Atual:</Text>
+                <Text style={styles.currentRiskLabel}>Nível de Risco Avaliado:</Text>
                 <Text style={[styles.currentRiskText, { color: currentRisk.color }]}>
                   {currentRisk.text}
                 </Text>
               </View>
             )}
 
-            {latestData && (
+            {analyzedData && (
               <View style={styles.dataDetailsCard}>
-                <Text style={styles.dataDetailsTitle}>Baseado no último registro:</Text>
-                <Text style={styles.dataDetailsText}>Umidade: {latestData.humidity || 'N/A'}%</Text>
-                <Text style={styles.dataDetailsText}>Inclinação: {latestData.inclination || 'N/A'}°</Text>
-                <Text style={styles.dataDetailsText}>Choveu na última semana: {latestData.choveuUltimaSemana ? 'Sim' : 'Não'}</Text>
-                <Text style={styles.dataDetailsText}>Temperatura Ambiente: {latestData.ambientTemperature || 'N/A'}°C</Text>
-                <Text style={styles.dataDetailsText}>Localização: {latestData.location || 'N/A'}</Text>
-                <Text style={styles.dataDetailsText}>Registrado em: {new Date(latestData.timestamp).toLocaleString()}</Text>
+                <Text style={styles.dataDetailsTitle}>Detalhes do Registro:</Text>
+                <Text style={styles.dataDetailsText}>Umidade: {analyzedData.humidity || 'N/A'}%</Text>
+                <Text style={styles.dataDetailsText}>Inclinação: {analyzedData.inclination || 'N/A'}°</Text>
+                <Text style={styles.dataDetailsText}>Choveu na última semana: {analyzedData.choveuUltimaSemana ? 'Sim' : 'Não'}</Text>
+                <Text style={styles.dataDetailsText}>Temperatura Ambiente: {analyzedData.ambientTemperature || 'N/A'}°C</Text>
+                <Text style={styles.dataDetailsText}>Localização: {analyzedData.location || 'N/A'}</Text>
+                <Text style={styles.dataDetailsText}>Registrado em: {new Date(analyzedData.timestamp).toLocaleString()}</Text>
               </View>
             )}
 

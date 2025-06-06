@@ -1,5 +1,6 @@
-import React from 'react';
+import React from 'react'; 
 import { createStackNavigator } from '@react-navigation/stack';
+import { Text, StyleSheet } from 'react-native'; 
 import WelcomeScreen from '../screens/WelcomeScreen';
 import DataEntryScreen from '../screens/DataEntryScreen';
 import RiskVisualizationScreen from '../screens/RiskVisualizationScreen';
@@ -28,31 +29,52 @@ function AppNavigator() {
             <Stack.Screen
                 name="DataEntry"
                 component={DataEntryScreen}
-                options={{ title: 'Inserção de Dados', headerBackTitleVisible: false }}
+                options={{
+                    headerTitle: () => <Text style={styles.headerTitle}>Inserção de Dados</Text>,
+                    headerBackTitleVisible: false
+                }}
             />
             <Stack.Screen
                 name="RiskVisualization"
                 component={RiskVisualizationScreen}
                 options={({ route }) => ({
-                        title: route.params?.data ? 'Análise do Registro' : 'Visualização de Riscos',
+                        headerTitle: () => (
+                            <Text style={styles.headerTitle}>
+                                {route.params?.data ? 'Análise do Registro' : 'Visualização de Riscos'}
+                            </Text>
+                        ),
                         headerBackTitleVisible: false
                 })}
             />
             <Stack.Screen
                 name="History"
                 component={HistoryScreen}
-                options={{ title: 'Histórico de Monitoramento', headerBackTitleVisible: false }}
+                options={{
+                    headerTitle: () => <Text style={styles.headerTitle}>Histórico de Monitoramento</Text>,
+                    headerBackTitleVisible: false
+                }}
             />
             <Stack.Screen
                 name="MitigationActions"
                 component={MitigationActionsScreen}
                 options={({ route }) => ({
-                        title: route.params?.data ? 'Ações para Registro' : 'Ações de Mitigação',
+                        headerTitle: () => (
+                            <Text style={styles.headerTitle}>
+                                {route.params?.data ? 'Ações para Registro' : 'Ações de Mitigação'}
+                            </Text>
+                        ),
                         headerBackTitleVisible: false
                 })}
             />
         </Stack.Navigator>
     );
 }
+
+const styles = StyleSheet.create({
+    headerTitle: {
+        fontSize: 18, 
+        color: '#2F4F4F',
+    },
+});
 
 export default AppNavigator;

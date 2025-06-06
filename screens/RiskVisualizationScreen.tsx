@@ -138,7 +138,7 @@ export default function RiskVisualizationScreen({ navigation, route }: RiskVisua
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F0F8FF', // AliceBlue
+    backgroundColor: '#F0F8FF',
   },
   scrollContent: {
     flexGrow: 1,
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontWeight: 'bold',
-    color: '#2F4F4F', // DarkSlateGray
+    color: '#2F4F4F',
     marginBottom: 40,
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.1)',
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginBottom: 30,
     borderWidth: 1,
-    borderColor: '#E0FFFF', // LightCyan
+    borderColor: '#E0FFFF',
   },
   dataCardTitle: {
     fontSize: 20,
@@ -192,12 +192,12 @@ const styles = StyleSheet.create({
   },
   dataValue: {
     fontSize: 16,
-    color: '#4682B4', // SteelBlue
+    color: '#4682B4',
     fontWeight: '600',
   },
   riskCard: {
     marginTop: 25,
-    borderTopWidth: 2, // Mais espesso para destaque
+    borderTopWidth: 2,
     paddingTop: 15,
     alignItems: 'center',
   },
@@ -208,9 +208,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   riskText: {
-    fontSize: 48, // Maior para destaque
+    fontSize: 48,
     fontWeight: 'bold',
-    textTransform: 'uppercase', // Maiúsculas para o nível de risco
+    textTransform: 'uppercase',
   },
   noDataText: {
     fontSize: 18,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   navButton: {
-    backgroundColor: '#6A5ACD', // SlateBlue
+    backgroundColor: '#6A5ACD',
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 25,
